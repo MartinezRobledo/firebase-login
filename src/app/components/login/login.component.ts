@@ -17,8 +17,8 @@ export class LoginComponent implements OnInit {
 
   constructor(private fb:FormBuilder, private afAuth:AngularFireAuth, private toastr:ToastrService, private router:Router, private fireCodeError:FirebaseCodeErrorService) {
     this.loginUsuario = fb.group({
-      email:['', Validators.required],
-      password:['', Validators.required]
+      email:['', [Validators.required, Validators.email]],
+      password:['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
@@ -32,7 +32,10 @@ export class LoginComponent implements OnInit {
     this.loading = true;
     this.afAuth.signInWithEmailAndPassword(email, password).then((user)=>{
       console.log(user);
-      this.router.navigate(['/dashboard']);
+      if(user.user?.emailVerified)
+        this.router.navigate(['/dashboard']);
+      else
+        this.router.navigate(['/verificar-correo']);
     }).catch((error)=>{
       this.loading = false;
       this.toastr.error(this.fireCodeError.firebaseError(error.code));

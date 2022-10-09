@@ -17,21 +17,20 @@ export class RecuperarPasswordComponent implements OnInit {
   loading:boolean = false;
 
   constructor(private fb:FormBuilder, private afAuth:AngularFireAuth, private toastr:ToastrService, private router:Router, private fireCodeError:FirebaseCodeErrorService) {
-    this.recuperarPassword = this.fb.group({email:['', Validators.required]});
+    this.recuperarPassword = this.fb.group({email:['', [Validators.required, Validators.email]]});
   }
 
   recuperar(){
     const email = this.recuperarPassword.value.email;
     this.loading = true;
     this.afAuth.sendPasswordResetEmail(email).then(()=>{
-      this.toastr.info('Le enviamos un correo para restablecer sus cambios', 'Restablecer Password');
+      this.toastr.info('Le enviamos un correo electronico para restablecer su contraseña', 'Recuperar Password');
       this.router.navigate(['/login']);
     }).catch((error)=>{
       this.loading = false;
       this.toastr.error(this.fireCodeError.firebaseError(error.code), 'Error');
     });
   }
-
 
   ngOnInit(): void {
   }
