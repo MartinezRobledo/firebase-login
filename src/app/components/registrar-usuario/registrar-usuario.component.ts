@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
+import { FirebaseCodeErrorService } from 'src/app/services/firebase-code-error.service';
 
 @Component({
   selector: 'app-registrar-usuario',
@@ -14,7 +15,7 @@ export class RegistrarUsuarioComponent implements OnInit {
   registrarUsuario: FormGroup;
   loader: boolean = false;
 
-  constructor(private fb: FormBuilder, private afAuth: AngularFireAuth, private toastr: ToastrService, private router: Router) {
+  constructor(private fb: FormBuilder, private afAuth: AngularFireAuth, private toastr: ToastrService, private router: Router, private fireCodeError:FirebaseCodeErrorService) {
     this.registrarUsuario = this.fb.group({
       email: ['', Validators.required],
       password: ['', Validators.required],
@@ -40,21 +41,8 @@ export class RegistrarUsuarioComponent implements OnInit {
       this.router.navigate(['/login']);
     }).catch((error) => {
       this.loader = false;
-      this.toastr.error(this.firebaseError(error.code), 'Error');
+      this.toastr.error(this.fireCodeError.firebaseError(error.code), 'Error');
     });
-  }
-
-  firebaseError(code: string) {
-    switch (code) {
-      case 'auth/email-already-in-use':
-        return 'El usuario ya existe';
-      case 'auth/weak-password':
-        return 'La contraseña es muy debil';
-      case 'auth/invalid-email':
-        return 'El formato del email es invalido';
-      default:
-        return 'Error desconocido';
-    }
   }
 
   ngOnInit(): void {
